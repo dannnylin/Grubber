@@ -1,6 +1,6 @@
 # Grubber
 
-<b>Installation and running instructions:</b>
+<b>Installation and running instructions:</b><br/>
   cd grubber/static<br/>
   npm install<br/>
   npm run watch<br/>
