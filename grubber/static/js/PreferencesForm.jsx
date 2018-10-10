@@ -6,7 +6,8 @@ export default class PreferencesForm extends React.Component {
 		super(props);
 		this.state = {
 			cuisines: ["American", "Chinese", "Japanese", "Korean", "Italian", "Mexican", "Greek", "Mediterranean", "Thai", "Peruvian", "Vietnamese", "Malaysian", "Flipino", "French", "Indian"],
-			prices: ["$", "$$", "$$$", "$$$$"]
+			prices: ["$", "$$", "$$$", "$$$$"],
+			distances: [1, 2, 5, 10]
 		};
 	}
 	
@@ -37,7 +38,17 @@ export default class PreferencesForm extends React.Component {
 						)}
 					</FormGroup>
 					<FormGroup>
-							<FormControl type="text" placeholder="Brooklyn, NY" />
+							<FormControl type="text" placeholder="Address, neighborhood, state or zip" />
+					</FormGroup>
+					<FormGroup>
+						<ControlLabel>
+							<FormControl componentClass="select">
+								<option value="select">Distance</option>
+								{this.state.distances.map(distance =>
+									<option key={distance} value={distance}>{distance} mile</option>
+								)}
+							</FormControl>
+						</ControlLabel>
 					</FormGroup>
 				</Form>
 				<Button bsStyle="primary">Find</Button>
