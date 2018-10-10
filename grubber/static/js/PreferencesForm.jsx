@@ -10,18 +10,23 @@ export default class PreferencesForm extends React.Component {
 			distances: [1, 2, 5, 10]
 		};
 	}
-	
+
+	handleSubmit(event) {
+		event.preventDefault();
+		console.log("hello world");
+	}
+
 	render() {
 		return (
 			<Grid bsClass="container">
-				<Form>
+				<Form onSubmit={this.handleSubmit}>
 					<FormGroup>
 						<ControlLabel>
 							Cuisine Preference
 						</ControlLabel>
 						<Row className="show-grid">
 						{this.state.cuisines.map(cuisine => 
-						<Col xs={6} md={4}>
+						<Col xs={6} md={4} key={cuisine}>
 							<Checkbox key={cuisine.toLowerCase()}> 
 								{cuisine} 
 							</Checkbox>
@@ -45,13 +50,13 @@ export default class PreferencesForm extends React.Component {
 							<FormControl componentClass="select">
 								<option value="select">Distance</option>
 								{this.state.distances.map(distance =>
-									<option key={distance} value={distance}>{distance} mile</option>
+									<option key={distance} value={distance}>{distance + (distance > 1 ? " miles" : " 	mile")} </option>
 								)}
 							</FormControl>
 						</ControlLabel>
 					</FormGroup>
 				</Form>
-				<Button bsStyle="primary">Find</Button>
+				<Button type="submit" bsStyle="primary">Find</Button>
 			</Grid>
 		)
 	}

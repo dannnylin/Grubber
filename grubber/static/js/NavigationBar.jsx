@@ -7,7 +7,7 @@ export default class NavigationBar extends React.Component {
 	}
 	render() {
 		return (
-			<Navbar>
+			<Navbar inverse>
 			  <Navbar.Header>
 			    <Navbar.Brand>
 			      <a href="#home">Grubber</a>
