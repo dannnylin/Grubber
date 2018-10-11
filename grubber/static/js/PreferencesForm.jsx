@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Form, FormGroup, Checkbox, FormControl, ControlLabel, Button, Col, Row } from 'react-bootstrap';
+import { Button, Form, FormGroup, Label, Input, FormText, Container, Row, Col } from 'reactstrap';
 
 export default class PreferencesForm extends React.Component {
 	constructor(props) {
@@ -18,46 +18,49 @@ export default class PreferencesForm extends React.Component {
 
 	render() {
 		return (
-			<Grid bsClass="container">
+			<Container>
 				<Form onSubmit={this.handleSubmit}>
 					<FormGroup>
-						<ControlLabel>
-							Cuisine Preference
-						</ControlLabel>
+						<Label>
+							<strong>Cuisine Preference</strong>
+						</Label>
 						<Row className="show-grid">
 						{this.state.cuisines.map(cuisine => 
 						<Col xs={6} md={4} key={cuisine}>
-							<Checkbox key={cuisine.toLowerCase()}> 
-								{cuisine} 
-							</Checkbox>
+							<Label check>
+								<Input type="checkbox" key={cuisine.toLowerCase()} /> 
+									{cuisine}
+							</Label>
 						</Col>)
 						}
 						</Row>
 					</FormGroup>
 					<FormGroup>
-						<ControlLabel>
-							Price <br/>
-						</ControlLabel>
+						<Label>
+							<strong>Price</strong>
+						</Label>
 						{this.state.prices.map((price, index) =>
-							<Checkbox inline key={index + 1}> {price} </Checkbox>
+							<Col xs={6} md={4} key={price}>
+								<Label check>
+									<Input type="checkbox" key={index + 1} /> {price}
+								</Label>
+							</Col>
 						)}
 					</FormGroup>
 					<FormGroup>
-							<FormControl type="text" placeholder="Address, neighborhood, state or zip" />
+						<Input type="text" placeholder="Address, neighborhood, state or zip" />
 					</FormGroup>
 					<FormGroup>
-						<ControlLabel>
-							<FormControl componentClass="select">
-								<option value="select">Distance</option>
-								{this.state.distances.map(distance =>
-									<option key={distance} value={distance}>{distance + (distance > 1 ? " miles" : " 	mile")} </option>
-								)}
-							</FormControl>
-						</ControlLabel>
+						<Label for="exampleSelectMulti"><strong>Distance</strong></Label>
+							<Input type="select" name="selectMulti" id="exampleSelectMulti" multiple>
+							{this.state.distances.map(distance =>
+								<option key={distance} value={distance}>{distance + (distance > 1 ? " miles" : " 	mile")} </option>
+							)}
+							</Input>
 					</FormGroup>
 				</Form>
-				<Button type="submit" bsStyle="primary">Find</Button>
-			</Grid>
+				<Button type="submit">Find</Button>
+			</Container>
 		)
 	}
 }

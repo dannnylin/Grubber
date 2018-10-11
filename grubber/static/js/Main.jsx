@@ -1,6 +1,7 @@
 import React from 'react';
 import NavigationBar from "./NavigationBar";
 import PreferencesForm from "./PreferencesForm";
+import TinderView from './TinderView';
 
 export default class Main extends React.Component {
 	constructor(props) {
@@ -11,6 +12,7 @@ export default class Main extends React.Component {
 			<div>
 				<NavigationBar />
 				<PreferencesForm />
+				<TinderView />
 			</div>
 		)
 	}
