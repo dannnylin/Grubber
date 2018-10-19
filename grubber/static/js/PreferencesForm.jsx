@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Form, FormGroup, Label, Input, FormText, Container, Row, Col } from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input, FormText, Container, Row, Col, timeoutsShape } from 'reactstrap';
 
 export default class PreferencesForm extends React.Component {
 	constructor(props) {
@@ -11,15 +11,10 @@ export default class PreferencesForm extends React.Component {
 		};
 	}
 
-	handleSubmit(event) {
-		event.preventDefault();
-		console.log("hello world");
-	}
-
 	render() {
 		return (
-			<Container>
-				<Form onSubmit={this.handleSubmit}>
+			<Container style={{padding: 20}}>
+				<Form action="/restaurants" method="POST">
 					<FormGroup>
 						<Label>
 							<strong>Cuisine Preference</strong>
@@ -28,7 +23,7 @@ export default class PreferencesForm extends React.Component {
 						{this.state.cuisines.map(cuisine => 
 						<Col xs={6} md={4} key={cuisine}>
 							<Label check>
-								<Input type="checkbox" key={cuisine.toLowerCase()} /> 
+								<Input type="checkbox" name="cuisines[]" key={cuisine.toLowerCase()} value={cuisine} /> 
 									{cuisine}
 							</Label>
 						</Col>)
@@ -42,24 +37,24 @@ export default class PreferencesForm extends React.Component {
 						{this.state.prices.map((price, index) =>
 							<Col xs={6} md={4} key={price}>
 								<Label check>
-									<Input type="checkbox" key={index + 1} /> {price}
+									<Input type="checkbox" name="price[]" key={index + 1} value={index + 1}/> {price}
 								</Label>
 							</Col>
 						)}
 					</FormGroup>
 					<FormGroup>
-						<Input type="text" placeholder="Address, neighborhood, state or zip" />
+						<Input type="text" name="address" placeholder="Address, neighborhood, state or zip" />
 					</FormGroup>
 					<FormGroup>
-						<Label for="exampleSelectMulti"><strong>Distance</strong></Label>
-							<Input type="select" name="selectMulti" id="exampleSelectMulti" multiple>
+						<Label><strong>Distance</strong></Label>
+							<Input type="select" name="distance" id="distance" multiple>
 							{this.state.distances.map(distance =>
 								<option key={distance} value={distance}>{distance + (distance > 1 ? " miles" : " 	mile")} </option>
 							)}
 							</Input>
 					</FormGroup>
+					<Button>Find</Button>
 				</Form>
-				<Button type="submit">Find</Button>
 			</Container>
 		)
 	}
