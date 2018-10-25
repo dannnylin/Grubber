@@ -1,29 +1,107 @@
 import React from 'react';
 import { Button, Form, FormGroup, Label, Input, FormText, Container, Row, Col, timeoutsShape } from 'reactstrap';
+import { Redirect } from 'react-router-dom';
 
 export default class PreferencesForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			cuisines: ["American", "Chinese", "Japanese", "Korean", "Italian", "Mexican", "Greek", "Mediterranean", "Thai", "Peruvian", "Vietnamese", "Malaysian", "Flipino", "French", "Indian"],
-			prices: ["$", "$$", "$$$", "$$$$"],
-			distances: [1, 2, 5, 10]
+			cuisines: {
+				"American": false, 
+				"Chinese": false, 
+				"Japanese": false, 
+				"Korean": false, 
+				"Italian": false, 
+				"Mexican": false, 
+				"Greek": false, 
+				"Mediterranean": false,
+				 "Thai": false, 
+				 "Peruvian": false, 
+				 "Vietnamese": false, 
+				 "Malaysian": false, 
+				 "Flipino": false, 
+				 "French": false, 
+				 "Indian": false
+			},
+			prices: {
+				1: false, 
+				2: false, 
+				3: false,
+				4: false
+			},
+			distances: {
+				1: false,
+				2: false,
+				5: false,
+				10: false
+			},
+			address: "",
+			redirect: false
 		};
+
+		this.handleCuisineChange = this.handleCuisineChange.bind(this);
+		this.handlePriceChange = this.handlePriceChange.bind(this);
+		this.handleDistanceChange = this.handleDistanceChange.bind(this);
+		this.handleAddressChange = this.handleAddressChange.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
+	}
+
+	handleCuisineChange(event) {
+		var cuisine = event.target.name;
+		this.state.cuisines[cuisine] = !this.state.cuisines[cuisine];
+	}
+
+	handlePriceChange(event) {
+		var price = event.target.name;
+		this.state.prices[price] = !this.state.prices[price];
+	}
+
+	handleDistanceChange(event) {
+		var distance = event.target.value;
+		this.state.distances[distance] = !this.state.distances[distance];
+	}
+
+	handleAddressChange(event) {
+		var address = event.target.value;
+		this.state.address = address;
+	}
+
+	handleSubmit(event) {
+		event.preventDefault();
+		fetch('/api/restaurants', {
+			method: 'post',
+			headers: {'Content-Type':'application/json'},
+			body: JSON.stringify(this.state)
+		}).then(response => {
+			response.json().then(data => {
+				this.setState({
+					redirect: true
+				});
+				console.log(data);
+			})
+		});
+	}
+
+	renderRedirect() {
+		if (this.state.redirect) {
+			return <Redirect to="/restaurantsView" />
+		}
 	}
 
 	render() {
 		return (
 			<Container style={{padding: 20}}>
-				<Form action="/restaurants" method="POST">
+				{ this.renderRedirect() }
+				<Form onSubmit={this.handleSubmit}>
 					<FormGroup>
 						<Label>
 							<strong>Cuisine Preference</strong>
 						</Label>
 						<Row className="show-grid">
-						{this.state.cuisines.map(cuisine => 
+						{Object.keys(this.state.cuisines).map((cuisine, i) => 
 						<Col xs={6} md={4} key={cuisine}>
 							<Label check>
-								<Input type="checkbox" name="cuisines[]" key={cuisine.toLowerCase()} value={cuisine} /> 
+								<Input type="checkbox" name={cuisine} onChange={this.handleCuisineChange} key={cuisine.toLowerCase()} value={this.state.cuisines[cuisine]} /> 
 									{cuisine}
 							</Label>
 						</Col>)
@@ -34,24 +112,24 @@ export default class PreferencesForm extends React.Component {
 						<Label>
 							<strong>Price</strong>
 						</Label>
-						{this.state.prices.map((price, index) =>
+						{Object.keys(this.state.prices).map((price, index) =>
 							<Col xs={6} md={4} key={price}>
 								<Label check>
-									<Input type="checkbox" name="price[]" key={index + 1} value={index + 1}/> {price}
+									<Input type="checkbox" name={price} onChange={this.handlePriceChange} key={index + 1} value={this.state.prices[price]}/> {"$".repeat(price)}
 								</Label>
 							</Col>
 						)}
 					</FormGroup>
 					<FormGroup>
-						<Input type="text" name="address" placeholder="Address, neighborhood, state or zip" />
+						<Input type="text" name="address" onChange={this.handleAddressChange} placeholder="Address, neighborhood, state or zip" />
 					</FormGroup>
 					<FormGroup>
-						<Label><strong>Distance</strong></Label>
-							<Input type="select" name="distance" id="distance" multiple>
-							{this.state.distances.map(distance =>
-								<option key={distance} value={distance}>{distance + (distance > 1 ? " miles" : " 	mile")} </option>
+						<Label><strong>Distance</strong></Label><br/>
+						<select name="distance" onChange={this.handleDistanceChange} id="distance" multiple>
+							{Object.keys(this.state.distances).map((distance, index) =>
+								<option key={distance} name={distance} value={distance}>{distance + (distance > 1 ? " miles" : " 	mile")} </option>
 							)}
-							</Input>
+							</select>
 					</FormGroup>
 					<Button>Find</Button>
 				</Form>
