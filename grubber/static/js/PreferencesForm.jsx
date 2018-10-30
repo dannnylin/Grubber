@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, Form, FormGroup, Label, Input, FormText, Container, Row, Col, timeoutsShape } from 'reactstrap';
-import { Redirect } from 'react-router-dom';
+import { Redirect, withRouter } from 'react-router-dom';
 
-export default class PreferencesForm extends React.Component {
+class PreferencesForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -75,16 +75,19 @@ export default class PreferencesForm extends React.Component {
 		}).then(response => {
 			response.json().then(data => {
 				this.setState({
-					redirect: true
+					redirect: true,
+					response: data
 				});
-				console.log(data);
 			})
 		});
 	}
 
 	renderRedirect() {
 		if (this.state.redirect) {
-			return <Redirect to="/restaurantsView" />
+			this.props.history.push({
+				pathname: '/restaurantsView',
+				state: { restaurants: this.state.response }
+			});
 		}
 	}
 
@@ -137,3 +140,4 @@ export default class PreferencesForm extends React.Component {
 		)
 	}
 }
+export default withRouter(PreferencesForm);

@@ -23,23 +23,20 @@ const actionsStyles = {
 export default class RestaurantCard extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      cards: ["Restaurant One", "Restaurant Two", "Restaurant Three"],
-    };
+    console.log(this.props.restaurants);
     this.remove = this.remove.bind(this);
+    this.restaurants = this.props.restaurants;
   }
 
   remove() {
-    this.setState(({ cards }) => ({
-      cards: cards.slice(1, cards.length),
-  }))};
+    this.restaurants = this.restaurants.splice(1, this.restaurants.length);
+  };
 
   render() {
-    const { cards } = this.state;
     return (
       <div style={appStyles}>
         <div style={wrapperStyles}>
-          {cards.length > 0 ? (
+          {this.restaurants.length > 0 ? (
             <div>
               <Swipeable
                 buttons={({ left, right }) => (
@@ -53,12 +50,12 @@ export default class RestaurantCard extends React.Component {
                 <Card>
                   <CardBody>
                     {/* <CardImg width="25%" src="https://www.nextpittsburgh.com/wp-content/uploads/2017/03/1U6A2894-1.jpg"/> */}
-                    <CardTitle>{cards[0]}</CardTitle>
-                    <Button>Button</Button>
+                    <CardTitle>{this.restaurants[0].name}</CardTitle>
+                    <Button>Learn More</Button>
                   </CardBody>
                 </Card>
               </Swipeable>
-              {cards.length > 1 && <Card zindex={-1}>{cards[1]}</Card>}
+              {this.restaurants.length > 1 && <Card zindex={-1}>{this.restaurants[1].name}</Card>}
             </div>
           ) : (
               <Card zindex={-2}>No more cards</Card>

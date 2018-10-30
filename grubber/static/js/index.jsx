@@ -8,8 +8,8 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 ReactDOM.render((
   <BrowserRouter>
     <div>
-      <Route path="/" component={Main} />
-      <Route path="/restaurantsView" component={RestaurantsView} />
+      <Route path="/" exact component={Main} />
+      <Route path="/restaurantsView" exact component={RestaurantsView} />
     </div>
   </BrowserRouter>
   ),

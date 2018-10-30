@@ -8,7 +8,7 @@ export default class TinderView extends React.Component {
   }
   render() {
     return (
-      <RestaurantCard />
+      <RestaurantCard restaurants={this.props.restaurants}/>
     );
   }
 }
