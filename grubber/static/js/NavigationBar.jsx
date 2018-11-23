@@ -35,25 +35,19 @@ export default class NavigationBar extends React.Component {
 					<Collapse isOpen={this.state.isOpen} navbar>
 						<Nav className="ml-auto" navbar>
 							<NavItem>
-								<NavLink href="/components/">Components</NavLink>
-							</NavItem>
-							<NavItem>
-								<NavLink href="https://github.com/reactstrap/reactstrap">GitHub</NavLink>
+								<NavLink href="/favorites/">Favorites</NavLink>
 							</NavItem>
 							<UncontrolledDropdown nav inNavbar>
 								<DropdownToggle nav caret>
-									Options
+									Profile
                 </DropdownToggle>
 								<DropdownMenu right>
 									<DropdownItem>
-										Option 1
-                  </DropdownItem>
-									<DropdownItem>
-										Option 2
+										Settings
                   </DropdownItem>
 									<DropdownItem divider />
 									<DropdownItem>
-										Reset
+										Logout
                   </DropdownItem>
 								</DropdownMenu>
 							</UncontrolledDropdown>

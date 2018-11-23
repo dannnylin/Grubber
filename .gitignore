@@ -3,3 +3,4 @@ node_modules/
 npm-debug.log
 .DS_Store
 venv/
+*/.cpython-36.pyc

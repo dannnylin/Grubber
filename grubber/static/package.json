@@ -48,7 +48,7 @@
     "react-dom": "^16.5.2",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
-    "react-swipy": "0.0.6",
+    "react-swipeable-cards": "^1.0.6",
     "reactstrap": "^6.5.0"
   }
 }
