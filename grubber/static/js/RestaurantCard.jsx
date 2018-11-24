@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {render} from 'react-dom'
 import { Card, CardWrapper } from 'react-swipeable-cards'
+import Cookies from 'js-cookie';
 
 export default class RestaurantCard extends Component {
   constructor(props) {
@@ -12,19 +13,32 @@ export default class RestaurantCard extends Component {
       restaurants: this.props.restaurants,
       likedRestaurants: []
     }
-    console.log(this.state.restaurants);
   }
 
   onSwipeLeft(data) {
     this.setState({
       message: ""
     });
+    this.setState({
+      restaurants: this.state.restaurants.slice(1)
+    });
   }
 
   onSwipeRight(data) {
+    data["uuid"] = Cookies.get('uuid');
     this.setState({
       message: "You liked " + data.name,
       likedRestaurants: this.state.likedRestaurants.concat(data)
+    });
+    fetch('/api/addFavorite', {
+      method: 'post',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    }).then(response => {
+      console.log(response);
+    });
+    this.setState({
+      restaurants: this.state.restaurants.slice(1)
     });
   }
 
@@ -44,7 +58,7 @@ export default class RestaurantCard extends Component {
     };
     return(
       <div style={titleStyle}>
-        You Finished Swiping!
+        No more restaurants
       </div>
     );
   }
