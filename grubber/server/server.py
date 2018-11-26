@@ -1,5 +1,5 @@
 import random
-from flask import Flask, render_template, request, make_response
+from flask import Flask, render_template, request, make_response, redirect, url_for
 from flask_pymongo import PyMongo
 import bcrypt
 from yelp import YelpAPI
@@ -39,8 +39,7 @@ def login():
         id = result["_id"]
         hashedPassword = result["password"]
         if bcrypt.checkpw(encodedPassword, hashedPassword):
-            print("correct login info")
-            res = make_response("setting uuid cookie")
+            res = make_response(redirect('/'))
             res.set_cookie('uuid', str(id), max_age=60*60*24)
             return res
         else:
@@ -64,6 +63,15 @@ def getFavorites():
     result = users.find_one({"_id": userId})
     response = result["favorites"]
     return json.dumps(response)
+
+@app.route('/api/addSeenRestaurants', methods=['POST'])
+def addSeenRestaurants():
+    data = json.loads(request.data)
+    userId = ObjectId(data["uuid"])
+    del data["uuid"]
+    for restaurant in data["restaurants"]:
+        users.find_one_and_update({"_id": userId}, {"$addToSet": {"seen": restaurant["id"]}})
+    return "Done"
 
 @app.route('/api/logout')
 def logout():

@@ -20,7 +20,7 @@ BUSINESS_PATH = '/v3/businesses/'
 
 DEFAULT_TERM = 'restaurant'
 DEFAULT_RADIUS = 32000  # 20 miles
-SEARCH_LIMIT = 50
+SEARCH_LIMIT = 2
 
 
 class YelpAPI(object):
@@ -48,12 +48,13 @@ class YelpAPI(object):
         """
 
         url_params = {
-            'term': term.replace(' ', '+'),
+            'term': categories.replace(',', ' or '),
             'location': location.replace(' ', '+'),
-            'categories': categories,
+            # 'categories': "restaurants," + categories,
             'limit': SEARCH_LIMIT,
             'price': price,
-            'radius': radius
+            'radius': radius,
+            'sort_by': 'best_match'
         }
 
         return self.request(SEARCH_PATH, url_params=url_params)

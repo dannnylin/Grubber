@@ -45,7 +45,6 @@ class NavigationBar extends React.Component {
 	}
 	renderRedirect() {
 		if (this.state.redirect) {
-			console.log(this.state.restaurants);
 			this.props.history.push({
 				pathname: '/favorites',
 				state: { restaurants: this.state.restaurants }

@@ -3,6 +3,14 @@ import {render} from 'react-dom'
 import { Card, CardWrapper } from 'react-swipeable-cards'
 import Cookies from 'js-cookie';
 
+class MyEndCard extends Component {
+  render() {
+    return(
+      <div>You Finished Swiping!</div>
+    );
+  }
+}
+
 export default class RestaurantCard extends Component {
   constructor(props) {
     super(props);
@@ -11,6 +19,7 @@ export default class RestaurantCard extends Component {
       messageButton: "Add End Card",
       showEndCard: false,
       restaurants: this.props.restaurants,
+      seenRestaurants: this.props.restaurants,
       likedRestaurants: []
     }
   }
@@ -49,6 +58,19 @@ export default class RestaurantCard extends Component {
   }
 
   addEndCard() {
+    if (this.state.restaurants.length == 0) {
+      let data = {
+        restaurants: this.state.seenRestaurants,
+        uuid: Cookies.get('uuid')
+      };
+      fetch('/api/addSeenRestaurants', {
+        method: 'post',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      }).then(response => {
+        console.log(response);
+      });
+    }
     let titleStyle = {
       textAlign: "center",
       fontWeight: "bold",
@@ -57,20 +79,9 @@ export default class RestaurantCard extends Component {
       marginTop: "10px"
     };
     return(
-      <div style={titleStyle}>
-        No more restaurants
+      <div>
       </div>
     );
-  }
-
-  changeEndCardState(e) {
-    e.preventDefault();
-    let showingEndCard = this.state.showEndCard;
-    let message = showingEndCard ? "Add End Card" : "Remove End Card";
-    this.setState({
-      messageButton: message,
-      showEndCard: !showingEndCard
-    });
   }
 
   renderCards() {
@@ -124,7 +135,7 @@ export default class RestaurantCard extends Component {
     }
     return(
       <div style={containerStyle}>
-        <CardWrapper style={wrapperStyle} addEndCard={this.state.showEndCard ? this.addEndCard.bind(this) : null}>
+        <CardWrapper style={wrapperStyle} addEndCard={this.addEndCard.bind(this)}>
           {this.renderCards()}
         </CardWrapper>
         <div style={messageStyle}>{this.state.message}</div>
