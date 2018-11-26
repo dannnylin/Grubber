@@ -2,7 +2,7 @@ import React from 'react';
 import NavigationBar from "./NavigationBar";
 import PreferencesForm from "./PreferencesForm";
 import Cookies from 'js-cookie';
-import Form from "./AuthenticationForm";
+import Login from "./LoginForm";
 
 export default class Main extends React.Component {
 	constructor(props) {
@@ -22,8 +22,7 @@ export default class Main extends React.Component {
 		} else {
 			return (
 				<div>
-					<NavigationBar />
-					<Form />
+					<Login />
 				</div>
 			)
 		}

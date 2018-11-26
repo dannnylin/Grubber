@@ -20,7 +20,7 @@ def index():
 def restaurants():
     return render_template('index.html')
 
-@app.route('/api/register')
+@app.route('/api/register', methods=['POST'])
 def register():
     data = request.form
     encodedPassword = data['password'].encode("utf-8")
@@ -28,6 +28,7 @@ def register():
     user = {"email": data['email'], "password": hashedPassword, "favorites": []}
     result = users.insert_one(user)
     print(result.inserted_id)
+    return "done"
 
 @app.route('/api/login', methods=['POST'])
 def login():
