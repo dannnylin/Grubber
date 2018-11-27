@@ -94,8 +94,12 @@ export default class RestaurantCard extends Component {
       marginTop: "10px"
     };
     let imageStyle = {
-      maxWidth: "100%",
-      height: "auto"
+      width: "200px",
+      height: "200px",
+      marginTop: "15px"
+    }
+    let containerStyle = {
+      textAlign: "center"
     }
     return data.map((d) => {
       return(
@@ -109,7 +113,7 @@ export default class RestaurantCard extends Component {
           <div style={titleStyle}>
             {d.name}
           </div>
-          <div>
+          <div style={containerStyle}>
             <img src={d.image_url} style={imageStyle} />
           </div>
         </Card>
@@ -119,11 +123,12 @@ export default class RestaurantCard extends Component {
 
   render() {
     let wrapperStyle = {
-      backgroundColor: "#024773",
-      height: "80vh"
+      backgroundColor: "#e9ecef",
+      height: "80vh",
+      margin: "5px"
     };
     let containerStyle = {
-      backgroundColor: "#024773",
+      backgroundColor: "#ffffff",
       height: "calc(100vh - 16px)"
     }
     let messageStyle = {

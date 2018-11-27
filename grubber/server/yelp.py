@@ -20,7 +20,7 @@ BUSINESS_PATH = '/v3/businesses/'
 
 DEFAULT_TERM = 'restaurant'
 DEFAULT_RADIUS = 32000  # 20 miles
-SEARCH_LIMIT = 2
+SEARCH_LIMIT = 50
 
 
 class YelpAPI(object):

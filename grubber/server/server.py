@@ -10,7 +10,8 @@ app = Flask(__name__, static_folder='../static/dist', template_folder='../static
 app.config["MONGO_URI"] = "mongodb://admin:password123@ds121262.mlab.com:21262/grubber"
 mongo = PyMongo(app)
 yelp = YelpAPI()
-users = mongo.db.users
+users_db = mongo.db.users
+restaurants_db = mongo.db.restaurants
 
 @app.route('/')
 def index():
@@ -23,18 +24,17 @@ def restaurants():
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.form
-    encodedPassword = data['password'].encode("utf-8")
+    encodedPassword = data['password'].encode("utf8")
     hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
     user = {"email": data['email'], "password": hashedPassword, "favorites": []}
-    result = users.insert_one(user)
-    print(result.inserted_id)
+    result = users_db.insert_one(user)
     return "done"
 
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.form
-    encodedPassword = data['password'].encode("utf-8")
-    result = users.find_one({"email": data["email"]}) 
+    encodedPassword = data['password'].encode("utf8")
+    result = users_db.find_one({"email": data["email"]}) 
     if result:
         id = result["_id"]
         hashedPassword = result["password"]
@@ -52,15 +52,14 @@ def favoriteRestaurant():
     data = json.loads(request.data)
     userId = ObjectId(data["uuid"])
     del data["uuid"]
-    result = users.find_one_and_update({"_id": userId}, {"$addToSet": {"favorites": data}})
+    result = users_db.find_one_and_update({"_id": userId}, {"$addToSet": {"favorites": data}})
     return "Done"
 
 @app.route('/api/getFavorites', methods=['POST'])
 def getFavorites():
     data = json.loads(request.data)
-    print(data)
     userId = ObjectId(data["uuid"])
-    result = users.find_one({"_id": userId})
+    result = users_db.find_one({"_id": userId})
     response = result["favorites"]
     return json.dumps(response)
 
@@ -70,7 +69,7 @@ def addSeenRestaurants():
     userId = ObjectId(data["uuid"])
     del data["uuid"]
     for restaurant in data["restaurants"]:
-        users.find_one_and_update({"_id": userId}, {"$addToSet": {"seen": restaurant["id"]}})
+        users_db.find_one_and_update({"_id": userId}, {"$addToSet": {"seen": restaurant["id"]}})
     return "Done"
 
 @app.route('/api/logout')
@@ -79,19 +78,27 @@ def logout():
     res.delete_cookie('uuid')
     return res
 
+@app.route('/api/restaurant/<restaurantId>')
+def getRestaurantInfo(restaurantId):
+    result = restaurants_db.find_one({"_id": restaurantId})
+    return json.dumps(result)
+
 @app.route('/api/restaurants', methods=['POST'])
 def getRestaurants():
     data = json.loads(request.data)
     cuisines = ",".join([cuisine for (cuisine, selected) in data['cuisines'].items() if selected])
-    print(cuisines)
     prices = ",".join([price for (price, selected) in data['prices'].items() if selected])
-    print(prices)
     address = data['address'].replace(" ", "%20")
-    print(address)
     distances = [float(distance) * 1609.34 for (distance, selected)
                  in data['distances'].items() if selected]
-    print(distances)
     response = yelp.search(address, cuisines, price=prices)
+    businesses =  response["businesses"]
+    for restaurant in businesses:
+        restaurant["_id"] = restaurant.pop("id")
+        try:
+            restaurants_db.insert_one(restaurant)
+        except Exception as e:
+            pass
     return json.dumps(response)
 
 if __name__ == '__main__':

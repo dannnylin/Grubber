@@ -7,14 +7,33 @@ export default class FavoritesView extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-	      restaurants: this.props.location.state.restaurants
-	    };
+				restaurants: this.props.location.state.restaurants,
+				redirect: false
+	  };
+	}
+
+	redirect(data) {
+		let restaurantId = data["id"] ? "id" in data : data["_id"];
+		console.log(restaurantId);
+		this.setState({
+			restaurantId: restaurantId,
+			redirect: true
+		});
+	}
+
+	renderRedirect() {
+		if (this.state.redirect) {
+			this.props.history.push({
+				pathname: '/restaurant/' + this.state.restaurantId
+			});
+		}
 	}
 
 	render() {
 		let data = this.state.restaurants;
 		return (
 			<div>
+				{this.renderRedirect()}
 				<NavigationBar/>
 				<Table>
 					<thead>
@@ -26,8 +45,8 @@ export default class FavoritesView extends React.Component {
 					</thead>
 		   			<tbody>
 	   					{data.map((restaurant) =>
-							<tr key={restaurant.name.toLowerCase()}>
-								<td>{restaurant.name}</td>
+							<tr>
+								<td key={restaurant.name.toLowerCase()} onClick={this.redirect.bind(this, restaurant)}>{restaurant.name}</td>
 								<td>{restaurant.price}</td>
 								<td>{restaurant.review_count} reviews - {restaurant.rating} &#9733;</td>
 							</tr>
@@ -38,11 +57,3 @@ export default class FavoritesView extends React.Component {
 		)
 	}
 }
-
-// {data.map((restaurant) => {
-// 		   				<Row>
-// 		   					<Col key={restaurant.id}>
-// 		   						{restaurant.name}
-// 		   					</Col>
-// 		   				</Row>
-// 		   			})}

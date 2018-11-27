@@ -7,6 +7,7 @@ import FavoritesView from "./FavoritesView";
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import LoginForm from "./LoginForm";
 import RegistrationForm from "./RegistrationForm";
+import BusinessView from "./BusinessView";
 
 ReactDOM.render((
   <BrowserRouter>
@@ -16,6 +17,7 @@ ReactDOM.render((
       <Route path="/login" exact component={LoginForm} />
       <Route path="/restaurantsView" exact component={RestaurantsView} />
       <Route path="/favorites" exact component={FavoritesView} />
+      <Route path="/restaurant/:id" exact component={BusinessView} />
     </div>
   </BrowserRouter>
   ),

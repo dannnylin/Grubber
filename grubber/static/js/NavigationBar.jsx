@@ -55,7 +55,7 @@ class NavigationBar extends React.Component {
 		return (
 			<div>
 				{ this.renderRedirect() }
-				<Navbar color="light" light expand="md">
+				<Navbar color="dark" dark expand="md">
 					<NavbarBrand href="/">Grubber</NavbarBrand>
 					<NavbarToggler onClick={this.toggle} />
 					<Collapse isOpen={this.state.isOpen} navbar>
