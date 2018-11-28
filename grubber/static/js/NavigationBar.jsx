@@ -51,6 +51,10 @@ class NavigationBar extends React.Component {
 			});
 		}
 	}
+	logout(event) {
+		event.preventDefault();
+		window.location = '/api/logout';
+	}
 	render() {
 		return (
 			<div>
@@ -72,7 +76,7 @@ class NavigationBar extends React.Component {
 										Settings
                   </DropdownItem>
 									<DropdownItem divider />
-									<DropdownItem>
+									<DropdownItem onClick={this.logout.bind(this)}>
 										Logout
                   </DropdownItem>
 								</DropdownMenu>

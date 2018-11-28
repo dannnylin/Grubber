@@ -124,11 +124,11 @@ class PreferencesForm extends React.Component {
 						)}
 					</FormGroup>
 					<FormGroup>
-						<Input type="text" name="address" onChange={this.handleAddressChange} placeholder="Address, neighborhood, state or zip" />
+						<Input type="text" name="address" onChange={this.handleAddressChange} placeholder="Address, neighborhood, state or zip" required />
 					</FormGroup>
 					<FormGroup>
 						<Label><strong>Distance</strong></Label><br/>
-						<select name="distance" onChange={this.handleDistanceChange} id="distance" multiple>
+						<select name="distance" onChange={this.handleDistanceChange} id="distance" multiple required>
 							{Object.keys(this.state.distances).map((distance, index) =>
 								<option key={distance} name={distance} value={distance}>{distance + (distance > 1 ? " miles" : " 	mile")} </option>
 							)}

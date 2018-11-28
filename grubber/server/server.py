@@ -24,16 +24,20 @@ def restaurants():
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.form
-    encodedPassword = data['password'].encode("utf8")
-    hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
-    user = {"email": data['email'], "password": hashedPassword, "favorites": []}
-    result = users_db.insert_one(user)
-    return "done"
+    encodedPassword = bytes(data['password'], encoding="utf-8")
+    result = users_db.find_one({"email": data["email"]})
+    if result:
+        return "you already have an account"
+    else:
+        hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
+        user = {"email": data['email'], "password": hashedPassword, "favorites": []}
+        result = users_db.insert_one(user)
+        return redirect('/')
 
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.form
-    encodedPassword = data['password'].encode("utf8")
+    encodedPassword = bytes(data['password'], encoding="utf-8")
     result = users_db.find_one({"email": data["email"]}) 
     if result:
         id = result["_id"]
@@ -74,7 +78,7 @@ def addSeenRestaurants():
 
 @app.route('/api/logout')
 def logout():
-    res = make_response("deleting uuid cookie")
+    res = make_response(redirect('/'))
     res.delete_cookie('uuid')
     return res
 
