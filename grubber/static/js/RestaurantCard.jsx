@@ -25,11 +25,19 @@ export default class RestaurantCard extends Component {
   }
 
   onSwipeLeft(data) {
+    data["uuid"] = Cookies.get('uuid');
     this.setState({
       message: ""
     });
     this.setState({
       restaurants: this.state.restaurants.slice(1)
+    });
+    fetch('/api/addSeenRestaurant', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(response => {
+      // console.log(response);
     });
   }
 
@@ -44,10 +52,17 @@ export default class RestaurantCard extends Component {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(data)
     }).then(response => {
-      console.log(response);
+      // console.log(response);
     });
     this.setState({
       restaurants: this.state.restaurants.slice(1)
+    });
+    fetch('/api/addSeenRestaurant', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(response => {
+      // console.log(response);
     });
   }
 
@@ -58,19 +73,6 @@ export default class RestaurantCard extends Component {
   }
 
   addEndCard() {
-    if (this.state.restaurants.length == 0) {
-      let data = {
-        restaurants: this.state.seenRestaurants,
-        uuid: Cookies.get('uuid')
-      };
-      fetch('/api/addSeenRestaurants', {
-        method: 'post',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(data)
-      }).then(response => {
-        console.log(response);
-      });
-    }
     let titleStyle = {
       textAlign: "center",
       fontWeight: "bold",

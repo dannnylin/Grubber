@@ -36,7 +36,7 @@ class YelpAPI(object):
 
         return response.json()
 
-    def search(self, location, categories, term=DEFAULT_TERM, price="1,2,3,4", radius=DEFAULT_RADIUS):
+    def search(self, location, categories, term=DEFAULT_TERM, price="1,2,3,4", radius=DEFAULT_RADIUS, offset=0):
         """Query the Search API by a search term and location.
 
         Args:
@@ -54,7 +54,8 @@ class YelpAPI(object):
             'limit': SEARCH_LIMIT,
             'price': price,
             'radius': radius,
-            'sort_by': 'best_match'
+            'offset': offset,
+            'sort_by': 'best_match',
         }
 
         return self.request(SEARCH_PATH, url_params=url_params)

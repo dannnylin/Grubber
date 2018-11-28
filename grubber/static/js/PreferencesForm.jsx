@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Form, FormGroup, Label, Input, FormText, Container, Row, Col, timeoutsShape } from 'reactstrap';
 import { Redirect, withRouter } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 class PreferencesForm extends React.Component {
 	constructor(props) {
@@ -36,6 +37,7 @@ class PreferencesForm extends React.Component {
 				10: false
 			},
 			address: "",
+			uuid: Cookies.get('uuid'),
 			redirect: false
 		};
 

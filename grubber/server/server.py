@@ -67,13 +67,12 @@ def getFavorites():
     response = result["favorites"]
     return json.dumps(response)
 
-@app.route('/api/addSeenRestaurants', methods=['POST'])
-def addSeenRestaurants():
+@app.route('/api/addSeenRestaurant', methods=['POST'])
+def addSeenRestaurant():
     data = json.loads(request.data)
     userId = ObjectId(data["uuid"])
     del data["uuid"]
-    for restaurant in data["restaurants"]:
-        users_db.find_one_and_update({"_id": userId}, {"$addToSet": {"seen": restaurant["id"]}})
+    users_db.find_one_and_update({"_id": userId}, {"$addToSet": {"seen": data["_id"]}})
     return "Done"
 
 @app.route('/api/logout')
@@ -97,13 +96,32 @@ def getRestaurants():
                  in data['distances'].items() if selected]
     response = yelp.search(address, cuisines, price=prices)
     businesses =  response["businesses"]
-    for restaurant in businesses:
-        restaurant["_id"] = restaurant.pop("id")
+    userId = ObjectId(data["uuid"])
+    result = users_db.find_one({"_id": userId})
+    seenRestaurants = set(result["seen"])
+    filteredBusinesses = filterRestaurants(businesses, seenRestaurants)
+    currentOffset = 0
+    while len(filteredBusinesses) < 50:
+        currentOffset += 50
+        response2 = yelp.search(address, cuisines, price=prices, offset=currentOffset)
+        filteredBusinesses += filterRestaurants(response2["businesses"], seenRestaurants)
+    for restaurant in filteredBusinesses:
+        restaurant["_id"] = restaurant["id"]
         try:
             restaurants_db.insert_one(restaurant)
         except Exception as e:
             pass
+    response["businesses"] = filteredBusinesses
     return json.dumps(response)
+
+def filterRestaurants(businesses, seenRestaurants):
+    filteredBusinesses = []
+    for business in businesses:
+        if "_id" not in business:
+            business["_id"] = business["id"]
+        if business["_id"] not in seenRestaurants:
+            filteredBusinesses.append(business)
+    return filteredBusinesses
 
 if __name__ == '__main__':
     app.run()
