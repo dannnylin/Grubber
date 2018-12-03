@@ -70,6 +70,20 @@ class PreferencesForm extends React.Component {
 
 	handleSubmit(event) {
 		event.preventDefault();
+		let data = this.state;
+		data["uuid"] = Cookies.get("uuid");
+		fetch('/api/setPreferences', {
+			method: 'post',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(this.state)
+		}).then(response => {
+			response.json().then(data => {
+				this.setState({
+					redirect: true,
+					response: data
+				});
+			})
+		});
 		fetch('/api/restaurants', {
 			method: 'post',
 			headers: {'Content-Type':'application/json'},

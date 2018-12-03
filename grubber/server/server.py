@@ -30,7 +30,7 @@ def register():
         return "you already have an account"
     else:
         hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
-        user = {"email": data['email'], "password": hashedPassword, "favorites": []}
+        user = {"email": data['email'], "password": hashedPassword, "favorites": [], "seen": []}
         result = users_db.insert_one(user)
         return redirect('/')
 
@@ -73,6 +73,15 @@ def addSeenRestaurant():
     userId = ObjectId(data["uuid"])
     del data["uuid"]
     users_db.find_one_and_update({"_id": userId}, {"$addToSet": {"seen": data["_id"]}})
+    return "Done"
+
+@app.route('/api/setPreferences', methods=['POST'])
+def setPreferences():
+    data = json.loads(request.data)
+    userId = ObjectId(data["uuid"])
+    del data["uuid"]
+    result = users_db.find_one_and_update(
+        {"_id": userId}, {"$set": {"preferences": data}})
     return "Done"
 
 @app.route('/api/logout')
