@@ -30,7 +30,20 @@ class NavigationBar extends React.Component {
 			isOpen: !this.state.isOpen
 		});
 	}
-	redirect() {
+	redirect(event) {
+		if (event._dispatchInstances.memoizedProps.data == "favorites") {
+			this.setState({
+				location: "favorites"
+			});
+		} else if (event._dispatchInstances.memoizedProps.data == "friends") {
+			this.setState({
+				location: "friends"
+			});
+		} else {
+			this.setState({
+				location: "messages"
+			});
+		}
 		fetch('/api/getFavorites', {
 			method: 'post',
 			headers: {'Content-Type':'application/json'},
@@ -46,10 +59,20 @@ class NavigationBar extends React.Component {
 	}
 	renderRedirect() {
 		if (this.state.redirect) {
-			this.props.history.push({
-				pathname: '/favorites',
-				state: { restaurants: this.state.restaurants }
-			});
+			if (this.state.location == "favorites") {
+				this.props.history.push({
+					pathname: '/favorites',
+					state: { restaurants: this.state.restaurants }
+				});
+			} else if (this.state.location == "friends") {
+				this.props.history.push({
+					pathname: '/friends'
+				});
+			} else {
+				this.props.history.push({
+					pathname: '/messages'
+				});
+			}
 		}
 	}
 	logout(event) {
@@ -67,10 +90,13 @@ class NavigationBar extends React.Component {
 						<Collapse isOpen={this.state.isOpen} navbar>
 							<Nav className="ml-auto" navbar>
 								<NavItem>
-									<NavLink>Friends</NavLink>
+									<NavLink data={"friends"} onClick={this.redirect.bind(this)}>Friends</NavLink>
 								</NavItem>
 								<NavItem>
-									<NavLink onClick={this.redirect.bind(this)}>Favorites</NavLink>
+									<NavLink data={"messages"} onClick={this.redirect.bind(this)}>Messages</NavLink>
+								</NavItem>
+								<NavItem>
+									<NavLink data={"favorites"} onClick={this.redirect.bind(this)}>Favorites</NavLink>
 								</NavItem>
 								<UncontrolledDropdown nav inNavbar>
 									<DropdownToggle nav caret>
@@ -78,11 +104,11 @@ class NavigationBar extends React.Component {
                 </DropdownToggle>
 									<DropdownMenu right>
 										<DropdownItem>
-											Settings
+										Settings
                   </DropdownItem>
 										<DropdownItem divider />
 										<DropdownItem onClick={this.logout.bind(this)}>
-											Logout
+										Logout
                   </DropdownItem>
 									</DropdownMenu>
 								</UncontrolledDropdown>

@@ -5,6 +5,7 @@ import bcrypt
 from yelp import YelpAPI
 import json
 from bson.objectid import ObjectId
+from datetime import datetime
 
 app = Flask(__name__, static_folder='../static/dist', template_folder='../static')
 app.config["MONGO_URI"] = "mongodb://admin:password123@ds121262.mlab.com:21262/grubber"
@@ -26,7 +27,7 @@ def register():
         return "you already have an account"
     else:
         hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
-        user = {"email": data['email'], "password": hashedPassword, "favorites": [], "seen": [], "friends": [], messages: []}
+        user = {"email": data['email'], "password": hashedPassword, "favorites": [], "seen": [], "friends": [], "messages": []}
         result = users_db.insert_one(user)
         return redirect('/')
 
@@ -137,19 +138,20 @@ def getRestaurants():
     response["businesses"] = filteredBusinesses
     return json.dumps(response)
 
-@app.route('/api/friends', methods=['POST'])
-def searchFriends():
+@app.route('/api/searchFriend', methods=['POST'])
+def searchFriend():
     data = json.loads(request.data)
     email = data['email']
     results = users_db.find_one({"email": email})
-    return results
+    return json.dumps(results) if results else None
 
 @app.route('/api/getFriends', methods=['POST'])
 def getFriends():
     data = json.loads(request.data)
     userId = ObjectId(data["uuid"])
     results = users_db.find_one({"_id": userId})
-    return results
+    response = results["friends"]
+    return json.dumps(response)
 
 @app.route('/api/addFriend', methods=['POST'])
 def addFriend():
@@ -158,14 +160,29 @@ def addFriend():
     requesteeId = data['friend_id']
     users_db.find_one_and_update(
         {"_id": requesterId}, {"$addToSet": {"friends": requesteeId}})
+    users_db.find_one_and_update(
+        {"_id": requesteeId}, {"$addToSet": {"friends": requesterId}})
     return "Done"
 
 @app.route('/api/getMessages', methods=['POST'])
-def getFriends():
+def getMessages():
     data = json.loads(request.data)
     userId = ObjectId(data["uuid"])
     results = users_db.find_one({"_id": userId})
-    return results
+    response = results["messages"]
+    return json.dumps(response)
+
+@app.route('/api/sendMessage', methods=['POST'])
+def sendMessage():
+    data = json.loads(request.data)
+    userId = ObjectId(data["uuid"])
+    receiverId = ObjectId(data["friend_id"])
+    message = {"message": data["message"], "sender": userId, "receiver": receiverId, "timestamp": datetime.now()}
+    users_db.find_one_and_update(
+        {"_id": userId}, {"$addToSet": {"messages": message}})
+    users_db.find_one_and_update(
+        {"_id": receiverId}, {"$addToSet": {"messages": message}})
+    return "Done"
 
 def filterRestaurants(businesses, seenRestaurants):
     filteredBusinesses = []

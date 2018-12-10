@@ -8,6 +8,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import LoginForm from "./LoginForm";
 import RegistrationForm from "./RegistrationForm";
 import BusinessView from "./BusinessView";
+import FriendsView from "./FriendsView";
 
 ReactDOM.render((
   <BrowserRouter>
@@ -18,6 +19,7 @@ ReactDOM.render((
       <Route path="/restaurantsView" exact component={RestaurantsView} />
       <Route path="/favorites" exact component={FavoritesView} />
       <Route path="/restaurant/:id" exact component={BusinessView} />
+      <Route path="/friends" exact component={FriendsView} />
     </div>
   </BrowserRouter>
   ),
