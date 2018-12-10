@@ -17,10 +17,6 @@ restaurants_db = mongo.db.restaurants
 def index():
     return render_template('index.html')
 
-@app.route('/restaurantsView')
-def restaurants():
-    return render_template('index.html')
-
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.form
@@ -30,7 +26,7 @@ def register():
         return "you already have an account"
     else:
         hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
-        user = {"email": data['email'], "password": hashedPassword, "favorites": [], "seen": []}
+        user = {"email": data['email'], "password": hashedPassword, "favorites": [], "seen": [], "friends": [], messages: []}
         result = users_db.insert_one(user)
         return redirect('/')
 
@@ -50,6 +46,7 @@ def login():
             print("incorrect password")
     else:
         print("user not found")
+    return render_template('index.html')
 
 @app.route('/api/addFavorite', methods=['POST'])
 def favoriteRestaurant():
@@ -75,6 +72,13 @@ def addSeenRestaurant():
     users_db.find_one_and_update({"_id": userId}, {"$addToSet": {"seen": data["_id"]}})
     return "Done"
 
+@app.route('/api/getPreferences', methods=['POST'])
+def getPreferences():
+    data = json.loads(request.data)
+    userId = ObjectId(data["uuid"])
+    result = users_db.find_one({"_id": userId})
+    return json.dumps("preferences" in result)
+
 @app.route('/api/setPreferences', methods=['POST'])
 def setPreferences():
     data = json.loads(request.data)
@@ -82,6 +86,15 @@ def setPreferences():
     del data["uuid"]
     result = users_db.find_one_and_update(
         {"_id": userId}, {"$set": {"preferences": data}})
+    return "Done"
+
+@app.route('/api/setLastStack', methods=['POST'])
+def setLastStack():
+    data = json.loads(request.data)
+    userId = ObjectId(data["uuid"])
+    del data["uuid"]
+    result = users_db.find_one_and_update(
+        {"_id": userId}, {"$set": {"lastStack": data}})
     return "Done"
 
 @app.route('/api/logout')
@@ -110,8 +123,9 @@ def getRestaurants():
     seenRestaurants = set(result["seen"])
     filteredBusinesses = filterRestaurants(businesses, seenRestaurants)
     currentOffset = 0
-    while len(filteredBusinesses) < 50:
-        currentOffset += 50
+    print(filteredBusinesses)
+    while len(filteredBusinesses) < 30:
+        currentOffset += 30
         response2 = yelp.search(address, cuisines, price=prices, offset=currentOffset)
         filteredBusinesses += filterRestaurants(response2["businesses"], seenRestaurants)
     for restaurant in filteredBusinesses:
@@ -122,6 +136,36 @@ def getRestaurants():
             pass
     response["businesses"] = filteredBusinesses
     return json.dumps(response)
+
+@app.route('/api/friends', methods=['POST'])
+def searchFriends():
+    data = json.loads(request.data)
+    email = data['email']
+    results = users_db.find_one({"email": email})
+    return results
+
+@app.route('/api/getFriends', methods=['POST'])
+def getFriends():
+    data = json.loads(request.data)
+    userId = ObjectId(data["uuid"])
+    results = users_db.find_one({"_id": userId})
+    return results
+
+@app.route('/api/addFriend', methods=['POST'])
+def addFriend():
+    data = json.loads(request.data)
+    requesterId = ObjectId(data["uuid"])
+    requesteeId = data['friend_id']
+    users_db.find_one_and_update(
+        {"_id": requesterId}, {"$addToSet": {"friends": requesteeId}})
+    return "Done"
+
+@app.route('/api/getMessages', methods=['POST'])
+def getFriends():
+    data = json.loads(request.data)
+    userId = ObjectId(data["uuid"])
+    results = users_db.find_one({"_id": userId})
+    return results
 
 def filterRestaurants(businesses, seenRestaurants):
     filteredBusinesses = []

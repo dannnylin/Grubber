@@ -13,12 +13,17 @@ export default class FavoritesView extends React.Component {
 	}
 
 	redirect(data) {
-		let restaurantId = data["id"] ? "id" in data : data["_id"];
-		console.log(restaurantId);
-		this.setState({
-			restaurantId: restaurantId,
-			redirect: true
-		});
+		if ("id" in data) {
+			this.setState({
+				restaurantId: data["id"],
+				redirect: true
+			});
+		} else {
+			this.setState({
+				restaurantId: data["_id"],
+				redirect: true
+			});
+		}
 	}
 
 	renderRedirect() {

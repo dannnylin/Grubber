@@ -22,6 +22,27 @@ export default class RestaurantCard extends Component {
       seenRestaurants: this.props.restaurants,
       likedRestaurants: []
     }
+    window.addEventListener('beforeunload', this.onUnmount, false);
+  }
+
+  onUnmount() {
+    data = {
+      restaurants: this.state.restaurants,
+      uuid: Cookies.get('uuid')
+    };
+    console.log(data);
+    fetch('/api/setLastStack', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(response => {
+      console.log("done");
+    });
+  }
+
+  compomentWillUnmount() {
+    window.removeEventListener('beforeunload', this.onUnmount, false);
+    this.onUnmount();
   }
 
   onSwipeLeft(data) {

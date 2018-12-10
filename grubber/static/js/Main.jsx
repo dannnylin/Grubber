@@ -13,6 +13,19 @@ export default class Main extends React.Component {
 	}
 	render() {
 		if (this.state.isLoggedIn) {
+			fetch('/api/getPreferences', {
+				method: 'post',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ uuid: Cookies.get('uuid') })
+			}).then(response => {
+				response.json().then(data => {
+					if (data) {
+						console.log("have preferences set");
+					} else {
+						console.log("no preferences set");
+					}
+				});
+			});	
 			return (
 				<div>
 					<NavigationBar />
@@ -26,6 +39,5 @@ export default class Main extends React.Component {
 				</div>
 			)
 		}
-		
 	}
 }

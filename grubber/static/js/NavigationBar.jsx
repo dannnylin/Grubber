@@ -21,7 +21,8 @@ class NavigationBar extends React.Component {
 		this.toggle = this.toggle.bind(this);
 		this.state = {
 			isOpen: false,
-			redirect: false
+			redirect: false,
+			isLoggedIn: Cookies.get('uuid')
 		};
 	}
 	toggle() {
@@ -56,36 +57,53 @@ class NavigationBar extends React.Component {
 		window.location = '/api/logout';
 	}
 	render() {
-		return (
-			<div>
-				{ this.renderRedirect() }
-				<Navbar color="dark" dark expand="md">
-					<NavbarBrand href="/">Grubber</NavbarBrand>
-					<NavbarToggler onClick={this.toggle} />
-					<Collapse isOpen={this.state.isOpen} navbar>
-						<Nav className="ml-auto" navbar>
-							<NavItem>
-								<NavLink onClick={this.redirect.bind(this)}>Favorites</NavLink>
-							</NavItem>
-							<UncontrolledDropdown nav inNavbar>
-								<DropdownToggle nav caret>
-									Profile
+		if (this.state.isLoggedIn) {
+			return (
+				<div>
+					{this.renderRedirect()}
+					<Navbar color="dark" dark expand="md">
+						<NavbarBrand href="/">Grubber</NavbarBrand>
+						<NavbarToggler onClick={this.toggle} />
+						<Collapse isOpen={this.state.isOpen} navbar>
+							<Nav className="ml-auto" navbar>
+								<NavItem>
+									<NavLink>Friends</NavLink>
+								</NavItem>
+								<NavItem>
+									<NavLink onClick={this.redirect.bind(this)}>Favorites</NavLink>
+								</NavItem>
+								<UncontrolledDropdown nav inNavbar>
+									<DropdownToggle nav caret>
+										Profile
                 </DropdownToggle>
-								<DropdownMenu right>
-									<DropdownItem>
-										Settings
+									<DropdownMenu right>
+										<DropdownItem>
+											Settings
                   </DropdownItem>
-									<DropdownItem divider />
-									<DropdownItem onClick={this.logout.bind(this)}>
-										Logout
+										<DropdownItem divider />
+										<DropdownItem onClick={this.logout.bind(this)}>
+											Logout
                   </DropdownItem>
-								</DropdownMenu>
-							</UncontrolledDropdown>
-						</Nav>
-					</Collapse>
-				</Navbar>
-			</div>
-		);
+									</DropdownMenu>
+								</UncontrolledDropdown>
+							</Nav>
+						</Collapse>
+					</Navbar>
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					{this.renderRedirect()}
+					<Navbar color="dark" dark expand="md">
+						<NavbarBrand href="/">Grubber</NavbarBrand>
+						<NavbarToggler onClick={this.toggle} />
+						<Collapse isOpen={this.state.isOpen} navbar>
+						</Collapse>
+					</Navbar>
+				</div>
+			);
+		}
 	}
 }
 
