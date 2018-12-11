@@ -70,7 +70,7 @@ class NavigationBar extends React.Component {
 				});
 			} else {
 				this.props.history.push({
-					pathname: '/messages'
+					pathname: '/messagesList'
 				});
 			}
 		}

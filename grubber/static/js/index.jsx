@@ -9,6 +9,8 @@ import LoginForm from "./LoginForm";
 import RegistrationForm from "./RegistrationForm";
 import BusinessView from "./BusinessView";
 import FriendsView from "./FriendsView";
+import MessagesListView from "./MessagesListView";
+import MessageView from "./MessageView";
 
 ReactDOM.render((
   <BrowserRouter>
@@ -20,6 +22,8 @@ ReactDOM.render((
       <Route path="/favorites" exact component={FavoritesView} />
       <Route path="/restaurant/:id" exact component={BusinessView} />
       <Route path="/friends" exact component={FriendsView} />
+      <Route path="/messagesList" exact component={MessagesListView} />
+      <Route path="/message/:id" exact component={MessageView} />
     </div>
   </BrowserRouter>
   ),

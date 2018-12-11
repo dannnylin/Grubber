@@ -150,7 +150,7 @@ class PreferencesForm extends React.Component {
 							)}
 							</select>
 					</FormGroup>
-					<Button>Find</Button>
+					<Button color="primary">Find</Button>
 				</Form>
 			</Container>
 		)

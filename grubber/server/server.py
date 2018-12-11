@@ -6,6 +6,7 @@ from yelp import YelpAPI
 import json
 from bson.objectid import ObjectId
 from datetime import datetime
+from bson.json_util import dumps, loads
 
 app = Flask(__name__, static_folder='../static/dist', template_folder='../static')
 app.config["MONGO_URI"] = "mongodb://admin:password123@ds121262.mlab.com:21262/grubber"
@@ -143,7 +144,7 @@ def searchFriend():
     data = json.loads(request.data)
     email = data['email']
     results = users_db.find_one({"email": email})
-    return json.dumps(results) if results else None
+    return dumps([results]) if results else None
 
 @app.route('/api/getFriends', methods=['POST'])
 def getFriends():
@@ -157,11 +158,13 @@ def getFriends():
 def addFriend():
     data = json.loads(request.data)
     requesterId = ObjectId(data["uuid"])
-    requesteeId = data['friend_id']
+    requesteeEmail = data['friend']
+    result = users_db.find_one({"email": requesteeEmail})
+    requesteeId = json.loads(dumps(result))['_id']['$oid']
     users_db.find_one_and_update(
         {"_id": requesterId}, {"$addToSet": {"friends": requesteeId}})
     users_db.find_one_and_update(
-        {"_id": requesteeId}, {"$addToSet": {"friends": requesterId}})
+        {"_id": ObjectId(requesteeId)}, {"$addToSet": {"friends": requesteeId}})
     return "Done"
 
 @app.route('/api/getMessages', methods=['POST'])
@@ -176,12 +179,15 @@ def getMessages():
 def sendMessage():
     data = json.loads(request.data)
     userId = ObjectId(data["uuid"])
-    receiverId = ObjectId(data["friend_id"])
+    receiverId = data["friend_id"]
     message = {"message": data["message"], "sender": userId, "receiver": receiverId, "timestamp": datetime.now()}
-    users_db.find_one_and_update(
-        {"_id": userId}, {"$addToSet": {"messages": message}})
-    users_db.find_one_and_update(
-        {"_id": receiverId}, {"$addToSet": {"messages": message}})
+    # users_db.find_one_and_update(
+    #     {"_id": userId}, {"$addToSet": {"messages": message}})
+    # users_db.find_one_and_update(
+    #     {"_id": receiverId}, {"$addToSet": {"messages": message}})
+    messages = users_db.find_one({"_id": userId})
+    if receiverId not in messages["messages"]:
+        users_db.find_one_and_update({"_id": userId}, {"$addToSet": {"messages": {receiverId: message}}})
     return "Done"
 
 def filterRestaurants(businesses, seenRestaurants):
