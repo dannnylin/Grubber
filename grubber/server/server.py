@@ -173,21 +173,24 @@ def getMessages():
     userId = ObjectId(data["uuid"])
     results = users_db.find_one({"_id": userId})
     response = results["messages"]
-    return json.dumps(response)
+    for recipientId in response:
+        email = users_db.find_one({"_id": ObjectId(recipientId)})["email"]
+        for message in response[recipientId]:
+            message["recipientEmail"] = email
+    return dumps(response)
 
 @app.route('/api/sendMessage', methods=['POST'])
 def sendMessage():
+    print(request.json)
     data = json.loads(request.data)
     userId = ObjectId(data["uuid"])
     receiverId = data["friend_id"]
     message = {"message": data["message"], "sender": userId, "receiver": receiverId, "timestamp": datetime.now()}
-    # users_db.find_one_and_update(
-    #     {"_id": userId}, {"$addToSet": {"messages": message}})
-    # users_db.find_one_and_update(
-    #     {"_id": receiverId}, {"$addToSet": {"messages": message}})
-    messages = users_db.find_one({"_id": userId})
-    if receiverId not in messages["messages"]:
-        users_db.find_one_and_update({"_id": userId}, {"$addToSet": {"messages": {receiverId: message}}})
+    messages = users_db.find_one({"_id": userId})["messages"]
+    if receiverId not in messages:
+        messages[receiverId] = []
+    messages[receiverId].append(message)
+    users_db.find_one_and_update({"_id": userId}, {"$set": {"messages": messages}})
     return "Done"
 
 def filterRestaurants(businesses, seenRestaurants):
