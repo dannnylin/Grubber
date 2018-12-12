@@ -16,6 +16,7 @@ class FriendsView extends React.Component {
 		this.handleEmailChange = this.handleEmailChange.bind(this);
 		this.addFriend = this.addFriend.bind(this);
 		this.handleMessageClicked = this.handleMessageClicked.bind(this);
+		this.refresh = this.refresh.bind(this);
 	}
 
 	handleSubmit(event) {
@@ -36,21 +37,24 @@ class FriendsView extends React.Component {
 		});
 	}
 
-	componentWillMount() {
+	async refresh() {
 		var data = {
 			uuid: Cookies.get('uuid')
 		};
-		fetch('/api/getFriends', {
+		const response = await fetch('/api/getFriends', {
 			method: 'post',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(data)
-		}).then(response => {
-			response.json().then(data => {
-				this.setState({
-					friends: data
-				});
-			})
 		});
+		const json = await response.json();
+		console.log(json);
+		this.setState({
+			friends: json
+		});
+	}
+
+	async componentWillMount() {
+		this.refresh();	
 	}
 
 	handleEmailChange(event) {
@@ -72,8 +76,11 @@ class FriendsView extends React.Component {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(data)
 		}).then(response => {
-			response.json().then(data => {
-				console.log(data);
+			response.text().then(data => {
+				this.setState({
+					searchResults: []
+				});
+				this.refresh();
 			})
 		});
 	}

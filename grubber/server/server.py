@@ -29,7 +29,7 @@ def register():
         return "you already have an account"
     else:
         hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
-        user = {"email": data['email'], "password": hashedPassword, "favorites": [], "seen": [], "friends": [], "messages": {}}
+        user = {"email": data['email'], "password": hashedPassword, "favorites": [], "seen": [], "visited": [], "friends": [], "messages": {}}
         result = users_db.insert_one(user)
         return redirect('/')
 
@@ -58,6 +58,21 @@ def favoriteRestaurant():
     del data["uuid"]
     result = users_db.find_one_and_update({"_id": userId}, {"$addToSet": {"favorites": data}})
     return "Done"
+
+@app.route('/api/markVisited', methods=['POST'])
+def markVisited():
+    data = json.loads(request.data)
+    userId = ObjectId(data["uuid"])
+    users_db.find_one_and_update({"_id": userId}, {"$addToSet": {"visited": data["_id"]}})
+    return "Done"
+
+@app.route('/api/getVisited', methods=['POST'])
+def getVisited():
+    data = json.loads(request.data)
+    userId = ObjectId(data["uuid"])
+    result = users_db.find_one({"_id": userId})
+    response = result["visited"]
+    return json.dumps(response)
 
 @app.route('/api/getFavorites', methods=['POST'])
 def getFavorites():

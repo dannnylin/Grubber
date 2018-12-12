@@ -7,9 +7,25 @@ export default class FavoritesView extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-				restaurants: this.props.location.state.restaurants,
-				redirect: false
+			restaurants: this.props.location.state.restaurants,
+			redirect: false
 	  };
+	}
+
+	async componentDidMount() {
+	    var data = {
+			uuid: Cookies.get('uuid')
+		};
+		const response = await fetch('/api/getFavorites', {
+			method: 'post',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(data)
+		});
+		const json = await response.json();
+		console.log(json);
+		this.setState({
+			friends: json
+		});
 	}
 
 	redirect(data) {
