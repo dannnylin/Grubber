@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {render} from 'react-dom'
 import { Card, CardWrapper } from 'react-swipeable-cards'
 import Cookies from 'js-cookie';
+import { Row, Container } from 'reactstrap';
 
 class MyEndCard extends Component {
   render() {
@@ -125,6 +126,9 @@ export default class RestaurantCard extends Component {
       textAlign: "center"
     }
     return data.map((d) => {
+      const categories = d.categories.map((category) =>
+        <li key={category.title}>{category.title}</li> 
+      );
       return(
         <Card 
           key={d.id}
@@ -139,6 +143,14 @@ export default class RestaurantCard extends Component {
           <div style={containerStyle}>
             <img src={d.image_url} style={imageStyle} />
           </div>
+          <Container style={{ padding: 20, textAlign: "center"}}>
+            <strong>Price</strong> {d.price} <br/>
+            <strong>Rating</strong> {d.rating} <br/>
+            <strong>Reviews</strong> {d.review_count} <br/>
+            <strong>Distance</strong> {(d.distance / 1609.34).toFixed(2) } miles away <br/>
+            <strong>Categories</strong>
+            <ul>{categories}</ul>
+          </Container>
         </Card>
       );
     });
