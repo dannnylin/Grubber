@@ -7,6 +7,7 @@ import json
 from bson.objectid import ObjectId
 from datetime import datetime
 from bson.json_util import dumps, loads
+from urllib.parse import urlsplit, parse_qs
 
 app = Flask(__name__, static_folder='../static/dist', template_folder='../static')
 app.config["MONGO_URI"] = "mongodb://admin:password123@ds121262.mlab.com:21262/grubber"
@@ -28,7 +29,7 @@ def register():
         return "you already have an account"
     else:
         hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
-        user = {"email": data['email'], "password": hashedPassword, "favorites": [], "seen": [], "friends": [], "messages": []}
+        user = {"email": data['email'], "password": hashedPassword, "favorites": [], "seen": [], "friends": [], "messages": {}}
         result = users_db.insert_one(user)
         return redirect('/')
 
@@ -151,8 +152,13 @@ def getFriends():
     data = json.loads(request.data)
     userId = ObjectId(data["uuid"])
     results = users_db.find_one({"_id": userId})
-    response = results["friends"]
-    return json.dumps(response)
+    friends = results["friends"]
+    print(results["friends"])
+    response = []
+    for friendId in friends:
+        response.append(users_db.find_one({"_id": ObjectId(friendId)}))
+    print(response)
+    return dumps(response)
 
 @app.route('/api/addFriend', methods=['POST'])
 def addFriend():
@@ -185,13 +191,29 @@ def sendMessage():
     data = json.loads(request.data)
     userId = ObjectId(data["uuid"])
     receiverId = data["friend_id"]
-    message = {"message": data["message"], "sender": userId, "receiver": receiverId, "timestamp": datetime.now()}
+    userEmail = users_db.find_one({"_id": userId})["email"]
+    receiverEmail =  users_db.find_one({"_id": ObjectId(receiverId)})["email"]
+    message = {"message": data["message"], "sender": userId, "receiver": receiverId, "timestamp": datetime.now(), "senderEmail": userEmail, "receiverEmail": receiverEmail}
     messages = users_db.find_one({"_id": userId})["messages"]
     if receiverId not in messages:
         messages[receiverId] = []
     messages[receiverId].append(message)
     users_db.find_one_and_update({"_id": userId}, {"$set": {"messages": messages}})
     return "Done"
+
+@app.route('/api/getMessage/<info>', methods=['GET', 'POST'])
+def getMessage(info):
+    url_string = "http://www.google.com/hello?" + info
+    query = urlsplit(url_string).query
+    params = parse_qs(query)
+    userId, recipient = params["user"][0], params["recipient"][0]
+    results = users_db.find_one({"_id": ObjectId(userId)})
+    response = results["messages"]
+    for recipientId, messages in response.items():
+        if recipientId == recipient:
+            return dumps(messages)
+    return dumps([])
+
 
 def filterRestaurants(businesses, seenRestaurants):
     filteredBusinesses = []

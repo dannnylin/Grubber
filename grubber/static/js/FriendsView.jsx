@@ -9,11 +9,13 @@ class FriendsView extends React.Component {
 		super(props);
 		this.state = {
 			searchResults: [],
-			friends: []
+			friends: [],
+			redirect: false
 		};
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleEmailChange = this.handleEmailChange.bind(this);
 		this.addFriend = this.addFriend.bind(this);
+		this.handleMessageClicked = this.handleMessageClicked.bind(this);
 	}
 
 	handleSubmit(event) {
@@ -76,9 +78,29 @@ class FriendsView extends React.Component {
 		});
 	}
 
+	renderRedirect() {
+	    if (this.state.redirect) {
+	      console.log(this.state.recipient);
+	      this.props.history.push({
+	        pathname: '/message/' + this.state.recipient,
+	        state: { "userId": Cookies.get('uuid'), "recipient": this.state.recipient, "recipientEmail": this.state.recipientEmail }
+	      });
+	    }
+	}
+
+	handleMessageClicked(event) {
+		event.preventDefault();
+		this.setState({
+			recipient: event._dispatchInstances.memoizedProps.data,
+			recipientEmail: event._dispatchInstances.memoizedProps.email,
+			redirect: true
+		});
+	}
+
 	render() {
 		return (
 			<div>
+				{this.renderRedirect()}
 				<NavigationBar />
 				<Container style={{ padding: 20 }}>
 				<table>
@@ -108,10 +130,10 @@ class FriendsView extends React.Component {
 							<strong>Your Friends</strong>
 								{this.state.friends.map((friend) => (
 									<div>
-										{friend}
-										<Form key={friend.email}>
+										{friend.email}
+										<Form key={friend.email} >
 											<FormGroup>
-												<Button color="primary">Message</Button>
+												<Button data={friend._id["$oid"]} email={friend.email} color="primary" onClick={this.handleMessageClicked}>Message</Button>
 											</FormGroup>
 										</Form>
 									</div>

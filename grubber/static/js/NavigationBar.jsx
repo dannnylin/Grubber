@@ -98,20 +98,9 @@ class NavigationBar extends React.Component {
 								<NavItem>
 									<NavLink data={"favorites"} onClick={this.redirect.bind(this)}>Favorites</NavLink>
 								</NavItem>
-								<UncontrolledDropdown nav inNavbar>
-									<DropdownToggle nav caret>
-										Profile
-                </DropdownToggle>
-									<DropdownMenu right>
-										<DropdownItem>
-										Settings
-                  </DropdownItem>
-										<DropdownItem divider />
-										<DropdownItem onClick={this.logout.bind(this)}>
-										Logout
-                  </DropdownItem>
-									</DropdownMenu>
-								</UncontrolledDropdown>
+								<NavItem>
+									<NavLink onClick={this.logout.bind(this)}>Logout</NavLink>
+								</NavItem>
 							</Nav>
 						</Collapse>
 					</Navbar>

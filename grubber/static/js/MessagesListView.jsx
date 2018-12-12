@@ -8,7 +8,9 @@ class MessagesListView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      messages: []
+      messages: [],
+      redirect: false,
+      lookup: {}
     }
   }
 
@@ -22,15 +24,36 @@ class MessagesListView extends React.Component {
       body: JSON.stringify(uuid)
     }).then(response => {
       response.json().then(data => {
+        var phonebook = {};
+        for (var key in data) {
+          phonebook[key] = data[key][0]["recipientEmail"];
+        }
         this.setState( {
-          messages: data
+          messages: data,
+          lookup: phonebook
         });
       });
     });
   }
 
+  renderRedirect() {
+    if (this.state.redirect) {
+      console.log(this.state.recipient);
+      this.props.history.push({
+        pathname: '/message/' + this.state.recipient,
+        state: { "userId": Cookies.get('uuid'), "recipient": this.state.recipient, "recipientEmail": this.state.recipientEmail }
+      });
+    }
+  }
+
   handleMessageClick(event) {
-    console.log(event._dispatchInstances.memoizedProps.data);
+   var recipient = event._dispatchInstances.memoizedProps.data;
+   var recipientEmail = event._dispatchInstances.memoizedProps.email;
+    this.setState({
+      redirect: true,
+      recipient: recipient,
+      recipientEmail: recipientEmail
+    });
   }
 
   render() {
@@ -41,10 +64,11 @@ class MessagesListView extends React.Component {
     };
     return (
       <div>
+      {this.renderRedirect()}
         <NavigationBar />
         <Container style={{ padding: 20 }}>
           {Object.keys(this.state.messages).map((thread) => (
-            <Row style={rowStyle} data={thread} onClick={this.handleMessageClick.bind(this)}>
+            <Row style={rowStyle} data={thread} email={this.state.lookup[thread]} onClick={this.handleMessageClick.bind(this)}>
               {([this.state.messages[thread][0]]).map((message) => (
                 <div>
                   <strong>{message.recipientEmail}</strong> - {message.message}
