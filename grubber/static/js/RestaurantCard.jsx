@@ -126,7 +126,7 @@ export default class RestaurantCard extends Component {
       textAlign: "center"
     }
     return data.map((d) => {
-      const categories = d.categories.map((category) =>
+      const categories = d.categories.slice(0,2).map((category) =>
         <li key={category.title}>{category.title}</li> 
       );
       return(
